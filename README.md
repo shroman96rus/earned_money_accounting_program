@@ -1,0 +1,1 @@
+# earned_money_accounting_program
