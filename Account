@@ -1,0 +1,101 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
+
+namespace earned_money_accounting_program
+{
+    class Account
+    {
+        public string name { get; set; }
+        //Баланс оптеделется тем, что сумма баланса вычисляется в методе get путем добавления туда данных из листа alltransaction
+        public double balance
+        {
+            get
+            {
+               double balance = 0;
+                foreach (var item in allTransictions)
+                {
+                    balance += item.summaOperation;
+                }
+
+                return balance;
+            }
+
+        }
+        
+
+        //Конструктор создания акаунта
+        public Account(string name)
+        {
+            this.name = name;
+        }
+
+        List<Transaction> allTransictions = new List<Transaction>();
+
+        //Метод отвечающий за пополнение баланса при оплате за работу
+        public void PayForWork(DateTime date, double payment, string note)
+        {
+            var pay = new Transaction(date, payment, note);
+            allTransictions.Add(pay);
+            //balance += payment;
+        }
+
+        //Метод отвечающий за уменьшение баланса при оплате различных услуг
+        public void PaymentForWork(DateTime date, double payment, string note)
+        {
+            var pay = new Transaction(date, -payment, note);
+            allTransictions.Add(pay);
+            //balance += payment;
+        }
+        //вывод истории всех операций
+        public void history()
+        {
+            StringBuilder transactionHistory = new StringBuilder();
+            double balance = 0;
+            foreach (var item in allTransictions)
+            {
+                transactionHistory.Append($"{item.dateOperation.ToString("dd,MMM,yyyy")}\t{item.summaOperation}\t{item.operationСomment}\n");
+                balance += item.summaOperation;
+            }
+            transactionHistory.Append($"\n сумма заработанная на данный момент составляет:\t {balance}");
+            Console.WriteLine(transactionHistory.ToString());
+        }
+
+        public void CreateTable()
+        {
+
+            XDocument xdoc = new XDocument();
+            XElement tables = new XElement("table");
+            foreach (var item in allTransictions)
+            {
+                XElement id = new XElement("Transaction");
+                XAttribute dateNameAttr = new XAttribute("Date", item.dateOperation.ToString("dd,MMMM,yyyy"));
+                XElement operationCountElem = new XElement("Summa", item.summaOperation.ToString());
+                XElement operationNoteElem = new XElement("Comment", item.operationСomment);
+                XElement balanceEl = new XElement("Balance", balance.ToString());
+
+                //// добавляем атрибут и элементы в первый элемент
+                id.Add(dateNameAttr);
+                id.Add(operationCountElem);
+                id.Add(operationNoteElem);
+                id.Add(balanceEl);
+                
+                tables.Add(id);
+            }
+            xdoc.Add(tables);
+            xdoc.Save("tabliza.xml");
+
+        }
+
+        public void PrintAccount()
+        {
+            Console.WriteLine("Созданный аккаунт называется:\t {0}", this.name);
+        }
+
+
+    }
+}
