@@ -11,7 +11,7 @@ namespace earned_money_accounting_program
     class Account
     {
         public string name { get; set; }
-        //Баланс оптеделется тем, что сумма баланса вычисляется в методе get путем добавления туда данных из листа alltransaction
+        //Баланс определется тем, что сумма баланса вычисляется в методе get путем добавления туда данных из листа alltransaction
         public double balance
         {
             get
@@ -64,7 +64,8 @@ namespace earned_money_accounting_program
             transactionHistory.Append($"\n сумма заработанная на данный момент составляет:\t {balance}");
             Console.WriteLine(transactionHistory.ToString());
         }
-
+        
+        //Создание XML файла в который выгружиются все данные по операциям
         public void CreateTable()
         {
 
@@ -90,7 +91,8 @@ namespace earned_money_accounting_program
             xdoc.Save("tabliza.xml");
 
         }
-
+        
+        //Тестовый метод
         public void PrintAccount()
         {
             Console.WriteLine("Созданный аккаунт называется:\t {0}", this.name);
