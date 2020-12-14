@@ -8,7 +8,7 @@ namespace earned_money_accounting_program
 {
     class Transaction
     {
-        //Оюьявление переменных (комент к операции, сумма операции, дата операции)
+        //Обьявление переменных (комент к операции, сумма операции, дата операции)
         public string operationСomment { get; }
         public double summaOperation { get; }
         public DateTime dateOperation { get; }
