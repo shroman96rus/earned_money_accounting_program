@@ -11,11 +11,23 @@ namespace earned_money_accounting_program
     {
         static void Main(string[] args)
         {
-            
+            //Создание объекта класса Account
             Account buroPerevodov = new Account("Бюро переводов");
-            Operation();
-           
-           // выбор операции внесения или снятия денег
+
+            //выбираем каким образом мы будем получать данные
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine("Выберите хотите ли вы получать информацию из текстового файла, или вводить все даные сами\n" +
+                "Выберите 1 если хотите получить данные из текстового файла \tНажмите 2 если хотите вводить данные вручную");
+            Console.ResetColor();
+            
+            switch (Console.ReadLine())
+            {
+                case "1": buroPerevodov.TextRead(); break; 
+                case "2": Operation(); break;
+                default: Console.WriteLine("Вы ввели некорректное значение"); break;
+            }
+
+            // выбор операции внесения или снятия денег
             void Operation()
             {
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -74,3 +86,4 @@ namespace earned_money_accounting_program
         }
     }
 }
+
