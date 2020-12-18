@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Linq;
+using System.IO;
 
 namespace earned_money_accounting_program
 {
     class Account
     {
         public string name { get; set; }
-        //Баланс определется тем, что сумма баланса вычисляется в методе get путем добавления туда данных из листа alltransaction
+        //Баланс оптеделется тем, что сумма баланса вычисляется в методе get путем добавления туда данных из листа alltransaction
         public double balance
         {
             get
@@ -27,7 +27,6 @@ namespace earned_money_accounting_program
 
         }
         
-
         //Конструктор создания акаунта
         public Account(string name)
         {
@@ -41,16 +40,18 @@ namespace earned_money_accounting_program
         {
             var pay = new Transaction(date, payment, note);
             allTransictions.Add(pay);
-            //balance += payment;
+            
         }
 
         //Метод отвечающий за уменьшение баланса при оплате различных услуг
         public void PaymentForWork(DateTime date, double payment, string note)
         {
+        
             var pay = new Transaction(date, -payment, note);
             allTransictions.Add(pay);
-            //balance += payment;
+        
         }
+        
         //вывод истории всех операций
         public void history()
         {
@@ -58,14 +59,15 @@ namespace earned_money_accounting_program
             double balance = 0;
             foreach (var item in allTransictions)
             {
-                transactionHistory.Append($"{item.dateOperation.ToString("dd,MMM,yyyy")}\t{item.summaOperation}\t{item.operationСomment}\n");
+                transactionHistory.Append($"{item.dateOperation.ToString("dd.MMM.yyyy")}\t{item.summaOperation}\t{item.operationСomment}\n");
                 balance += item.summaOperation;
             }
-            transactionHistory.Append($"\n сумма заработанная на данный момент составляет:\t {balance}");
+            transactionHistory.Append($"Cумма заработанная на данный момент составляет:\t {balance}");
             Console.WriteLine(transactionHistory.ToString());
+            TextCreate(transactionHistory.ToString());
         }
-        
-        //Создание XML файла в который выгружиются все данные по операциям
+
+        //Создание XML файла на основе полученных данных
         public void CreateTable()
         {
 
@@ -74,25 +76,72 @@ namespace earned_money_accounting_program
             foreach (var item in allTransictions)
             {
                 XElement id = new XElement("Transaction");
-                XAttribute dateNameAttr = new XAttribute("Date", item.dateOperation.ToString("dd,MMMM,yyyy"));
+                XAttribute dateNameAttr = new XAttribute("Date", item.dateOperation.ToString("dd.MMMM.yyyy"));
                 XElement operationCountElem = new XElement("Summa", item.summaOperation.ToString());
                 XElement operationNoteElem = new XElement("Comment", item.operationСomment);
-                XElement balanceEl = new XElement("Balance", balance.ToString());
+                
 
                 //// добавляем атрибут и элементы в первый элемент
                 id.Add(dateNameAttr);
                 id.Add(operationCountElem);
                 id.Add(operationNoteElem);
-                id.Add(balanceEl);
-                
                 tables.Add(id);
             }
+            XElement balance = new XElement("Transaction");
+            XAttribute balNameAttr = new XAttribute("Date", "Cумма заработанная на данный момент составляет:");
+            XElement balEllement = new XElement("Summa", this.balance);
+            balance.Add(balNameAttr);
+            balance.Add(balEllement);
+            tables.Add(balance);
             xdoc.Add(tables);
-            xdoc.Save("tabliza.xml");
+
+            xdoc.Save(@"C:\Users\User\Desktop\111\result\tabliza.xml");
+            
+        }
+
+        //Создание текстового документа на основе полученных данных
+        public void TextCreate(string translation)
+        {
+            Random random = new Random();
+            random.Next(20);
+            string writePut = $@"C:\Users\User\Desktop\111\result\test{random.Next(20)}.txt";
+            StreamWriter sw = new StreamWriter(writePut);
+            sw.WriteLine(translation);
+            sw.WriteLine("This is a test");
+            sw.Close();
 
         }
-        
-        //Тестовый метод
+
+        //Чтение входящих данных из текстового файла
+        public void TextRead()
+        {
+            string readPut = @"C:\Users\User\Desktop\111\input\user.txt";
+            StreamReader sr = new StreamReader(readPut);
+            string textDocument;
+            while ((textDocument = sr.ReadLine())!= null)
+            {
+                string[] array = textDocument.Split('\t');
+                DateTime date = new DateTime();
+                double summa;
+                string note;
+                string[] textArr = textDocument.Split(' ');
+                date = Convert.ToDateTime(array[0]);
+                summa = Convert.ToDouble(array[1]);
+                note = array[2];
+                if (summa < 0)
+                {
+                    PaymentForWork(date, -summa, note);
+                }
+                else
+                {
+                    PayForWork(date, summa, note);
+                }
+            }
+            Console.WriteLine(textDocument);
+            
+
+        }
+
         public void PrintAccount()
         {
             Console.WriteLine("Созданный аккаунт называется:\t {0}", this.name);
